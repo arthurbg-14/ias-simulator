@@ -1,0 +1,16 @@
+5
+3
+1
+0
+LOAD MQ,M(2)
+LOAD M(2)
+SUB M(1)
+SUB M(2)
+JUMP + M(14)
+MUL M(0)
+LOAD M(1)
+SUB M(2)
+STOR M(1)
+JUMP M(5)
+LOAD MQ
+STOR M(3)
