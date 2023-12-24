@@ -1,17 +1,17 @@
--10
--20
--5
+1
+3
+2
 0
 LOAD M(0)
 SUB M(1)
-JUMP + M(10)
+JUMP + M(7,0:19)
 LOAD M(1)
 STOR M(3)
-JUMP M(12)
+JUMP M(8,0:19)
 LOAD M(0)
 STOR M(3)
 LOAD M(3)
 SUB M(2)
-JUMP + M(17)
+JUMP + M(11,0:19)
 LOAD M(2)
 STOR M(3)

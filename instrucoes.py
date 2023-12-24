@@ -11,8 +11,10 @@ class Instrucoes:
 			'00000010': self.loadNMX,
 			'00000011': self.loadAMX,
 			'00000100': self.loadANMX,
-			'00001101': self.jumpMX,
-			'00001111': self.jumpNNMX,
+			'00001101': self.jumpMXL,
+			'00001110': self.jumpMXR,
+			'00001111': self.jumpNNMXL,
+			'00010000': self.jumpNNMXR,
 			'00000101': self.addMX,
 			'00000111': self.addAMX,
 			'00000110': self.subMX,
@@ -21,6 +23,8 @@ class Instrucoes:
 			'00001100': self.divMX,
 			'00010100': self.lsh,
 			'00010101': self.rsh,
+			'00010010': self.storMXL,
+			'00010011': self.storMXR
 		}
 
 	def loadMQ(self):
@@ -71,20 +75,61 @@ class Instrucoes:
 
 		self.debug(f'  AC <- {binToInt(self.AC)}')
 
-	def jumpMX(self):
-		self.PC = intToBin(binToInt(self.MAR) - 1, 20)
+	def jumpMXL(self):
+		self.IBR = '00000000000000000000'
+		self.PC = intToBin(binToInt(self.MAR) - 1, 40)
 
-		self.debug(f'  Jumping to {binToInt(self.MAR)}')
+		if binToInt(self.MAR) >= len(self.memory):
+			self.debug('Jumping outside memory')
+			return
 
-	#Jump NonNegative M(X)
-	def jumpNNMX(self):
+		self.debug(f'  Jumping to {self.memory[binToInt(self.MAR)][0:20]}')
+
+	def jumpMXR(self):
+		self.PC = self.MAR
+		self.busca()
+		self.decodifica()
+
+		self.PC = intToBin(binToInt(self.PC) - 1, 40)
+
+		if binToInt(self.PC) >= len(self.memory):
+			self.debug('Jumping outside memory')
+			return
+
+		self.debug(f'  Jumping to {self.memory[binToInt(self.PC)][20:40]}')
+
+	#Jump NonNegative M(X) left
+	def jumpNNMXL(self):
 		if (self.AC[0] == '1'):
 			self.debug(f'  Not jumping')
 			return
 
-		self.PC = intToBin(binToInt(self.MAR) - 1, 20)
+		self.IBR = '00000000000000000000'
+		self.PC = intToBin(binToInt(self.MAR) - 1, 40)
 
-		self.debug(f'  Jumping to {binToInt(self.MAR)}')
+		if binToInt(self.MAR) >= len(self.memory):
+			self.debug('Jumping outside memory')
+			return
+
+		self.debug(f'  Jumping to {self.memory[binToInt(self.MAR)][0:20]}')
+
+	#Jump NonNegative M(X) right
+	def jumpNNMXR(self):
+		if (self.AC[0] == '1'):
+			self.debug(f'  Not jumping')
+			return
+
+		self.PC = self.MAR
+		self.busca()
+		self.decodifica()
+
+		self.PC = intToBin(binToInt(self.PC) - 1, 40)
+
+		if binToInt(self.PC) >= len(self.memory):
+			self.debug('Jumping outside memory')
+			return
+
+		self.debug(f'  Jumping to {self.memory[binToInt(self.PC)][20:40]}')
 
 	def addMX(self):
 		self.buscaOperandos()
@@ -123,8 +168,8 @@ class Instrucoes:
 
 		self.debug(f'  Multiplicando: {binToInt(self.MQ)} * {binToInt(self.MBR)}')
 		self.debug(f'  Resultado: {binToInt(resultado)}')
-		self.AC = resultado[:20]
-		self.MQ = resultado[20:]
+		self.AC = resultado[:40]
+		self.MQ = resultado[40:]
 		self.debug(f'  AC: {binToInt(self.AC)} MQ: {binToInt(self.MQ)}')
 
 	def divMX(self):
@@ -140,5 +185,23 @@ class Instrucoes:
 	def lsh(self):
 		self.AC = self.AC[1:] + '0'
 
+		self.debug(f'  AC <- AC * 2')
+
 	def rsh(self):
 		self.AC = '0' + self.AC[:-1]
+
+		self.debug(f'  AC <- AC / 2')
+
+	def storMXL(self):			
+			address = binToInt(self.MAR)
+
+			self.memory[address] = self.memory[address][0:8] + self.AC[-12:] + self.memory[address][20:40]
+
+			self.debug(f'  {address}: Pointer changed to {binToInt(self.AC[-12:])}')
+
+	def storMXR(self):
+			address = binToInt(self.MAR)
+
+			self.memory[address] = self.memory[address][0:28] + self.AC[-12:]
+
+			self.debug(f'  {address}: Pointer changed to {binToInt(self.AC[-12:])}')

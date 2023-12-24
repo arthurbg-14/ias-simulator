@@ -7,12 +7,13 @@ class IAS(Instrucoes):
 
 	memory = []
 	
-	AC = '00000000000000000000'
-	MQ = '00000000000000000000'
-	PC = '00000000000000000000'
-	MBR = '00000000000000000000'
-	MAR = '00000000000000000000'
+	AC = '0000000000000000000000000000000000000000'
+	MQ = '0000000000000000000000000000000000000000'
+	PC = '0000000000000000000000000000000000000000'
+	MBR = '0000000000000000000000000000000000000000'
+	MAR = '0000000000000000000000000000000000000000'
 	IR = '00000000000000000000'
+	IBR = '00000000000000000000'
 
 	def __init__(self, PC, debug=False):
 		super().__init__()
@@ -24,8 +25,14 @@ class IAS(Instrucoes):
 		self.MBR = self.memory[binToInt(self.MAR)]
 
 	def decodifica(self):
-		self.IR = self.MBR[0:8]
-		self.MAR = self.MBR[9:20]
+		if self.IBR != '00000000000000000000':
+			self.IR = self.IBR[0:8]
+			self.MAR = self.IBR[9:20]
+			self.IBR = '00000000000000000000'
+		else:
+			self.IR = self.MBR[0:8]
+			self.MAR = self.MBR[9:20]
+			self.IBR = self.MBR[20:40]
 
 	def buscaOperandos(self):
 		self.MBR = self.memory[binToInt(self.MAR)]
@@ -56,8 +63,11 @@ class IAS(Instrucoes):
 		self.busca()
 		self.decodifica()
 		self.executa()
+		if self.IBR != '00000000000000000000':
+			self.decodifica()
+			self.executa()
 
-		self.PC = intToBin(binToInt(self.PC) + 1, 20)
+		self.PC = intToBin(binToInt(self.PC) + 1, 40)
 
 		if (binToInt(self.PC) >= len(self.memory)):
 			print('Execução do programa finalizada!')

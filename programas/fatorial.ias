@@ -1,9 +1,9 @@
-6
+5
 1
 1
 LOAD M(1)
 SUB M(0)
-JUMP + M(14)
+JUMP + M(9,0:19)
 LOAD MQ,M(0)
 MUL M(2)
 LOAD MQ
@@ -11,4 +11,4 @@ STOR M(2)
 LOAD M(0)
 SUB M(1)
 STOR M(0)
-JUMP M(3)
+JUMP M(3,0:19)

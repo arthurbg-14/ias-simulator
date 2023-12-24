@@ -1,0 +1,57 @@
+9 //length
+0 //index
+1 //const
+2 //const
+5 //value 4 não funciona
+6 //list pointer
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+LOAD M(0)
+DIV M(3)
+LOAD MQ
+ADD M(5)
+STOR M(1) //i <- length / 2
+
+STOR M(20,8:19) //line 26 <- M(i)
+STOR M(22,28:39) //line 32 <- M(i)
+STOR M(26,8:19) //line 41 <- M(i)
+LOAD M(0) //LOAD M(i)
+
+SUB M(4)
+SUB M(2)
+JUMP + M(25,20:39) //M(i) != value? jump to line 40
+LOAD M(4)
+SUB M(0)
+SUB M(2)
+JUMP + M(25,20:39) //M(i) != value? jump to line 40
+
+LOAD M(1) //M(i) == value
+SUB M(5)//SUB list pointer
+JUMP M(34,0:19) //jump to end
+
+LOAD M(4)
+SUB M(0)
+JUMP + M(30,0:19) //M(i) < value? jump to line 51
+
+LOAD M(1) //AC <- i
+SUB M(5)//SUB list pointer
+RSH //i / 2
+ADD M(5) //ADD list pointer
+STOR M(1) //i <- i / 2
+JUMP M(18,20:39) //jump to line 23
+
+LOAD M(1) //AC <- i
+SUB M(5)//SUB list pointer
+RSH //i / 2
+ADD M(5) //ADD list pointer
+ADD M(1) //i + i/2
+STOR M(1) //i <- (i + (i/2))
+JUMP M(18,20:39) //jump to line 23

@@ -28,4 +28,4 @@ def divBin(bin1, bin2):
 	int1 = binToInt(bin1)
 	int2 = binToInt(bin2)
 
-	return intToBin(int1 // int2, 20), intToBin(int1 % int2, 20)
+	return intToBin(int1 // int2, 40), intToBin(int1 % int2, 40)
