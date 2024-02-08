@@ -83,20 +83,20 @@ class Instrucoes:
 			self.debug('Jumping outside memory')
 			return
 
-		self.debug(f'  Jumping to {self.memory[binToInt(self.MAR)][0:20]}')
+		self.debug(f'  Jumping to {binToInt(self.MAR)}')
 
 	def jumpMXR(self):
+		self.IBR = '00000000000000000000'
 		self.PC = self.MAR
-		self.busca()
-		self.decodifica()
-
-		self.PC = intToBin(binToInt(self.PC) - 1, 40)
 
 		if binToInt(self.PC) >= len(self.memory):
 			self.debug('Jumping outside memory')
 			return
 
-		self.debug(f'  Jumping to {self.memory[binToInt(self.PC)][20:40]}')
+		self.debug(f'  Jumping to {binToInt(self.MAR)}')
+
+		self.busca()
+		self.decodifica()
 
 	#Jump NonNegative M(X) left
 	def jumpNNMXL(self):
@@ -111,7 +111,7 @@ class Instrucoes:
 			self.debug('Jumping outside memory')
 			return
 
-		self.debug(f'  Jumping to {self.memory[binToInt(self.MAR)][0:20]}')
+		self.debug(f'  Jumping to {binToInt(self.MAR)}')
 
 	#Jump NonNegative M(X) right
 	def jumpNNMXR(self):
@@ -119,17 +119,17 @@ class Instrucoes:
 			self.debug(f'  Not jumping')
 			return
 
+		self.IBR = '00000000000000000000'
 		self.PC = self.MAR
-		self.busca()
-		self.decodifica()
-
-		self.PC = intToBin(binToInt(self.PC) - 1, 40)
 
 		if binToInt(self.PC) >= len(self.memory):
 			self.debug('Jumping outside memory')
 			return
 
-		self.debug(f'  Jumping to {self.memory[binToInt(self.PC)][20:40]}')
+		self.busca()
+		self.decodifica()
+
+		self.debug(f'  Jumping to {binToInt(self.MAR)}')
 
 	def addMX(self):
 		self.buscaOperandos()
@@ -194,14 +194,19 @@ class Instrucoes:
 
 	def storMXL(self):			
 			address = binToInt(self.MAR)
+			new_operand = self.AC[-12:]
 
-			self.memory[address] = self.memory[address][0:8] + self.AC[-12:] + self.memory[address][20:40]
+			self.memory[address] = self.memory[address][0:8] + new_operand + self.memory[address][20:40]
 
-			self.debug(f'  {address}: Pointer changed to {binToInt(self.AC[-12:])}')
+			self.debug(f'  {address}: Pointer changed to {binToInt(new_operand)}')
 
 	def storMXR(self):
 			address = binToInt(self.MAR)
+			new_operand = self.AC[-12:]
 
-			self.memory[address] = self.memory[address][0:28] + self.AC[-12:]
+			if address == binToInt(self.PC):
+				self.IBR = self.IBR[0:8] + new_operand
 
-			self.debug(f'  {address}: Pointer changed to {binToInt(self.AC[-12:])}')
+			self.memory[address] = self.memory[address][0:28] + new_operand
+
+			self.debug(f'  {address}: Pointer changed to {binToInt(new_operand)}')

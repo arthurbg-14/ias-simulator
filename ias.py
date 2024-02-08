@@ -37,8 +37,11 @@ class IAS(Instrucoes):
 	def buscaOperandos(self):
 		self.MBR = self.memory[binToInt(self.MAR)]
 
-	def executa(self):		
+	def executa(self):
 		self.instructions[self.IR]()
+		if self.IBR != '00000000000000000000':
+			self.decodifica()
+			self.executa()
 
 	def carga_memoria(self, nome_arquivo):
 			with open(nome_arquivo, "r") as fin:
@@ -63,9 +66,6 @@ class IAS(Instrucoes):
 		self.busca()
 		self.decodifica()
 		self.executa()
-		if self.IBR != '00000000000000000000':
-			self.decodifica()
-			self.executa()
 
 		self.PC = intToBin(binToInt(self.PC) + 1, 40)
 
@@ -73,15 +73,15 @@ class IAS(Instrucoes):
 			print('Execução do programa finalizada!')
 
 			print('Memoria:')
-			for index, linha in enumerate(ias.memory):
+			for index, linha in enumerate(self.memory):
 				print(str(index) + ': ' + linha, '(' + str(binToInt(linha)) + ')')
 			print('')
-			print('AC: ', ias.AC, '(' + str(binToInt(ias.AC)) + ')')
-			print('MQ: ', ias.MQ, '(' + str(binToInt(ias.MQ)) + ')')
-			print('PC: ', ias.PC, '(' + str(binToInt(ias.PC)) + ')')
-			print('MBR: ', ias.MBR, '(' + str(binToInt(ias.MBR)) + ')')
-			print('MAR: ', ias.MAR, '(' + str(binToInt(ias.MAR)) + ')')
-			print('IR: ', ias.IR, '(' + str(binToInt(ias.IR)) + ')')
+			print('AC: ', self.AC, '(' + str(binToInt(self.AC)) + ')')
+			print('MQ: ', self.MQ, '(' + str(binToInt(self.MQ)) + ')')
+			print('PC: ', self.PC, '(' + str(binToInt(self.PC)) + ')')
+			print('MBR: ', self.MBR, '(' + str(binToInt(self.MBR)) + ')')
+			print('MAR: ', self.MAR, '(' + str(binToInt(self.MAR)) + ')')
+			print('IR: ', self.IR, '(' + str(binToInt(self.IR)) + ')')
 			return
 
 		self.executePC()

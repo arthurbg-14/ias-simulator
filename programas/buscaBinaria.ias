@@ -1,9 +1,6 @@
-9 //length
-0 //index
-1 //const
-2 //const
-5 //value 4 não funciona
-6 //list pointer
+ARRAYPOINTER:3
+FIM:17
+INICIO:3
 1
 2
 3
@@ -13,45 +10,67 @@
 7
 8
 9
-0
-LOAD M(0)
-DIV M(3)
-LOAD MQ
-ADD M(5)
-STOR M(1) //i <- length / 2
+10
+11
+12
+13
+14
+15
+INDEX:0
+NUMBER1:1 //const
+ERROR:999 //const
+VALOR_PROCURADO:1
+RESULTADO:0
 
-STOR M(20,8:19) //line 26 <- M(i)
-STOR M(22,28:39) //line 32 <- M(i)
-STOR M(26,8:19) //line 41 <- M(i)
-LOAD M(0) //LOAD M(i)
+LOAD M(INICIO) // ACC <- INICIO
+ADD M(FIM) // ACC <- INICIO + FIM
+RSH // ACC <- (INICIO + FIM) / 2
+STOR M(INDEX) // INDEX <- (INICIO + FIM) / 2
 
-SUB M(4)
-SUB M(2)
-JUMP + M(25,20:39) //M(i) != value? jump to line 40
-LOAD M(4)
-SUB M(0)
-SUB M(2)
-JUMP + M(25,20:39) //M(i) != value? jump to line 40
+//caso o valor procurado seja menor que o primeiro elemento a busca é finalizada, o elemento não está na lista
+LOAD M(INICIO)
+STOR M(PRIMEIRO_ELEMENTO) //carrega o endereço do primeiro elemento no operando da instrução de baixo
+PRIMEIRO_ELEMENTO:LOAD M(0) //acc <- array[0]
+SUB M(VALOR_PROCURADO) // acc <- array[0] - VALOR_PROCURADO
+SUB M(NUMBER1) // acc <- array[0] - VALOR_PROCURADO - 1
+JUMP + M(NAO_ENCONTRADO)
 
-LOAD M(1) //M(i) == value
-SUB M(5)//SUB list pointer
-JUMP M(34,0:19) //jump to end
+//caso o valor procurado seja maior que o ultimo elemento a busca é finalizada, o elemento não está na lista
+LOAD M(FIM)
+STOR M(ULTIMO_ELEMENTO) //carrega o endereço do ultimo elemento no operando da instrução de baixo
+ULTIMO_ELEMENTO:LOAD M(0) //acc <- array[array.length]
+SUB M(VALOR_PROCURADO) // acc <- array[array.length] - VALOR_PROCURADO
+JUMP + M(BIN_SEARCH_LOOP)
+JUMP M(NAO_ENCONTRADO)
 
-LOAD M(4)
-SUB M(0)
-JUMP + M(30,0:19) //M(i) < value? jump to line 51
+BIN_SEARCH_LOOP:LOAD M(INDEX) // ACC <- INDEX
+STOR M(INDEX_1) // operando da linha de baixo recebe o valor de INDEX
+INDEX_1:LOAD M(1) // ACC <- M(INDEX)
+SUB M(VALOR_PROCURADO) // ACC <- M(INDEX) - VALOR_PROCURADO
+JUMP + M(MAIOR_IGUAL) // M(INDEX) <= VALOR_PROCURADO
 
-LOAD M(1) //AC <- i
-SUB M(5)//SUB list pointer
-RSH //i / 2
-ADD M(5) //ADD list pointer
-STOR M(1) //i <- i / 2
-JUMP M(18,20:39) //jump to line 23
+//caso o array[index] seja menor que o valor procurado, o index deve ser reduzido 
+LOAD M(INDEX) // ACC <- INDEX
+STOR M(INICIO) // INICIO <- INDEX
+ADD M(FIM) // ACC <- INICIO + FIM
+ADD M(NUMBER1) // ACC <- INICIO + FIM + 1
+RSH // ACC <- (INICIO + FIM) / 2
+STOR M(INDEX) // INDEX <- (INICIO + FIM) / 2
+JUMP M(BIN_SEARCH_LOOP)
 
-LOAD M(1) //AC <- i
-SUB M(5)//SUB list pointer
-RSH //i / 2
-ADD M(5) //ADD list pointer
-ADD M(1) //i + i/2
-STOR M(1) //i <- (i + (i/2))
-JUMP M(18,20:39) //jump to line 23
+//caso o array[index] seja maior que o valor procurado, o index deve ser aumentado
+MAIOR:LOAD M(INDEX) // ACC <- INDEX
+STOR M(FIM) // FIM <- INDEX
+ADD M(INICIO) // ACC <- INICIO + FIM
+RSH // ACC <- (INICIO + FIM) / 2
+STOR M(INDEX) // INDEX <- (INICIO + FIM) / 2
+JUMP M(BIN_SEARCH_LOOP)
+
+NAO_ENCONTRADO:LOAD M(ERROR)
+JUMP M(END)
+
+MAIOR_IGUAL:SUB M(NUMBER1) // ACC <- M(INDEX) - VALOR_PROCURADO - 1
+JUMP + M(MAIOR) // se (M(INDEX) - VALOR_PROCURADO - 1) não for mais maior que 0 então ele era igual
+LOAD M(INDEX) // ACC <- INDEX
+SUB M(ARRAYPOINTER) // ACC <- INDEX - INICIO
+END:STOR M(RESULTADO) // RESULTADO <- INDEX - INICIO
