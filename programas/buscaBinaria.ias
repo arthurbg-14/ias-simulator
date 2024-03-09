@@ -1,0 +1,65 @@
+3 //ARRAY PTR
+17 //FIM
+3 //INICIO
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+0 //INDEX
+1 //1 const
+999 //ERROR const
+12 //VALOR PROCURADO 
+0 //RESULTADO
+LOAD M(2) // ACC <- INICIO
+ADD M(1) // ACC <- INICIO + FIM
+RSH // ACC <- (INICIO + FIM) / 2
+STOR M(18) // INDEX <- (INICIO + FIM) / 2
+LOAD M(2)
+STOR OP(29) //carrega o endereço do primeiro elemento no operando da instrução de baixo
+LOAD M(0) //acc <- array[0]
+SUB M(21) // acc <- array[0] - VALOR_PROCURADO
+SUB M(19) // acc <- array[0] - VALOR_PROCURADO - 1
+JUMP + M(57)
+LOAD M(1)
+STOR OP(35) //carrega o endereço do ultimo elemento no operando da instrução de baixo
+LOAD M(0) //acc <- array[array.length]
+SUB M(21) // acc <- array[array.length] - VALOR_PROCURADO
+JUMP + M(39)
+JUMP M(57)
+LOAD M(18) // ACC <- INDEX
+STOR OP(41) // operando da linha de baixo recebe o valor de INDEX
+LOAD M(1) // ACC <- M(INDEX)
+SUB M(21) // ACC <- M(INDEX) - VALOR_PROCURADO
+JUMP + M(59) // M(INDEX) <= VALOR_PROCURADO
+LOAD M(18) // ACC <- INDEX
+STOR M(2) // INICIO <- INDEX
+ADD M(1) // ACC <- INICIO + FIM
+ADD M(19) // ACC <- INICIO + FIM + 1
+RSH // ACC <- (INICIO + FIM) / 2
+STOR M(18) // INDEX <- (INICIO + FIM) / 2
+JUMP M(39)
+LOAD M(18) // ACC <- INDEX
+STOR M(1) // FIM <- INDEX
+ADD M(2) // ACC <- INICIO + FIM
+RSH // ACC <- (INICIO + FIM) / 2
+STOR M(18) // INDEX <- (INICIO + FIM) / 2
+JUMP M(39)
+LOAD M(20)
+EXIT
+SUB M(19) // ACC <- M(INDEX) - VALOR_PROCURADO - 1
+JUMP + M(51) // se (M(INDEX) - VALOR_PROCURADO - 1) não for mais maior que 0 então ele era igual
+LOAD M(18) // ACC <- INDEX
+SUB M(0) // ACC <- INDEX - INICIO
+SUB M(19) // ACC <- ACC - 1
+STOR M(22) // RESULTADO <- INDEX - INICIO

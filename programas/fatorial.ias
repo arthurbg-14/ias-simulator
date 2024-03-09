@@ -12,3 +12,4 @@ LOAD M(0)
 SUB M(1)
 STOR M(0)
 JUMP M(3)
+EXIT

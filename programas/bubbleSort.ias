@@ -1,0 +1,59 @@
+LOAD M(46)    //ACC <- LIST LEN
+SUB M(47)     //ACC <- ACC - i
+SUB M(50)     //ACC <- ACC - 1
+JUMP + M(5)   //JUMP EXIT
+EXIT          //EXIT
+LOAD M(49)    //ACC <- 0
+STOR M(51)    //flag <- ACC  
+LOAD M(49)    //ACC <- 0
+STOR M(48)    //j <- ACC
+LOAD M(46)    //LOOP J START
+SUB M(48)     //ACC <- ACC - j
+SUB M(50)     //ACC <- ACC - 1
+JUMP + M(14)  //JUMP EXIT
+JUMP M(38)    //EXIT LOOP J
+LOAD M(47)    //ACC <- i
+ADD M(45)     //ACC <- ACC + LIST PTR
+STOR OP(24)   //&x1 <- ACC
+STOR OP(28)   //&x2 <- ACC
+STOR OP(31)   //&x3 <- ACC
+ADD M(50)     //ACC <- ACC - 1
+STOR OP(23)   //&y1 <- ACC
+STOR OP(26)   //&y2 <- ACC
+STOR OP(29)   //&y3 <- ACC
+LOAD M(0)     //ACC <- &y1
+SUB M(0)      //ACC <- ACC - &x1
+JUMP + M(38)  //EXIT LOOP J
+LOAD M(0)     //ACC <- &y2
+STOR M(52)    //temp <- ACC
+LOAD M(0)     //ACC <- &x2
+STOR M(0)     //&y3 <- ACC
+LOAD M(52)    //ACC <- temp
+STOR M(0)     //&x3 <- ACC
+LOAD M(50)    //ACC <- 1
+STOR M(51)    //flag <- 1
+LOAD M(48)    //ACC <- j
+ADD M(50)     //ACC <- ACC + 1
+STOR M(48)    //j <- ACC
+JUMP M(9)     //go to start of J LOOP
+LOAD M(51)    //ACC <- flag
+SUB M(50)     //ACC <- ACC - 1
+EXIT          //EXIT PROGRAM
+LOAD M(47)
+ADD M(50)     //ACC <- ACC + 1
+STOR M(47)
+JUMP M(0)
+53             //LIST PTR
+5             //LIST LEN
+0             //i
+0             //j
+0             //const 0
+1             //const 1
+0             //flag
+0             //temp
+1
+5
+2
+4
+5
+8

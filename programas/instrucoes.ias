@@ -1,0 +1,30 @@
+1             //a
+2             //b
+3             //c
+4             //d
+5             //e
+LOAD MQ,M(0)  //MQ <- 1
+MUL M(1)      //MQ <- 1 * 2
+LOAD MQ       //AC <- 2
+STOR M(0)     //M(0) <- 2
+LOAD M(3)     //AC <- 4
+ADD M(0)      //AC <- 4 + 2
+STOR M(0)     //M(0) <- 6
+LOAD -M(4)    //AC <- -5
+ADD M(0)      //AC <- 6 - 5
+SUB M(0)      //AC <- 1 - 6
+SUB |M(0)|    //AC <- -5 - 6
+STOR M(0)     //M(0) <- -11
+LOAD |M(0)|   //AC <- |-11|
+ADD |M(0)|    //AC <- 11 + 11
+LSH           //AC <- 22 * 2
+JUMP M(22)    //JUMP EXIT
+EXIT
+DIV M(2)      //MQ <- 44 // 3 AC <- 44 % 3
+STOR OP(24)   //OP(26) <- 2
+LOAD -|M(0)|  //AC <- -3 
+LSH           //AC <- |-3 * 2|
+RSH           //AC <- 6 // 2
+JUMP + M(29)  //JUMP EXIT
+EXIT
+ADD M(4)      //AC <- 3 + 5 = 8

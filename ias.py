@@ -5,81 +5,107 @@ import sys
 
 class IAS(Instrucoes):
 
-	memory = []
-	
-	AC = '00000000000000000000'
-	MQ = '00000000000000000000'
-	PC = '00000000000000000000'
-	MBR = '00000000000000000000'
-	MAR = '00000000000000000000'
-	IR = '00000000000000000000'
+    memory = []
 
-	def __init__(self, PC, debug=False):
-		super().__init__()
-		self.PC = PC
-		self.isDebug = debug
+    AC = '00000000000000000000'
+    MQ = '00000000000000000000'
+    PC = '00000000000000000000'
+    MBR = '00000000000000000000'
+    MAR = '00000000000000000000'
+    IR = '00000000000000000000'
+    
+    running = False
 
-	def busca(self):
-		self.MAR = self.PC
-		self.MBR = self.memory[binToInt(self.MAR)]
+    def __init__(self, debug=False):
+        super().__init__()
+        self.isDebug = debug
 
-	def decodifica(self):
-		self.IR = self.MBR[0:8]
-		self.MAR = self.MBR[9:20]
+    def busca(self):
+        self.MAR = self.PC
+        self.MBR = self.memory[binToInt(self.MAR)]
 
-	def buscaOperandos(self):
-		self.MBR = self.memory[binToInt(self.MAR)]
+    def decodifica(self):
+        self.IR = self.MBR[0:8]
+        self.MAR = self.MBR[9:20]
 
-	def executa(self):		
-		self.instructions[self.IR]()
+        if self.IR  != '00001111':
+            self.PC = incrementBin(self.PC)
 
-	def carga_memoria(self, nome_arquivo):
-			with open(nome_arquivo, "r") as fin:
-					programa = fin.readlines()
+    def buscaOperandos(self):
+        self.MBR = self.memory[binToInt(self.MAR)]
 
-			is_compiled = not any(('M' in linha or 'S' in linha) for linha in programa)
-			
-			if not is_compiled:
-				programa = compilar(programa)
+    def executa(self):		
+        self.instructions[self.IR]()
 
-			self.memory = [linha.replace("\n", "") for linha in programa]
+    def carga_memoria(self, nome_arquivo):
+        with open(nome_arquivo, "r") as fin:
+            programa = fin.readlines()
 
-	def loadProgram(self):
-		for line in programa:
-			self.memory.append(line)
+        is_compiled = not any(('M' in linha or 'S' in linha) for linha in programa)
+        
+        if not is_compiled:
+            programa = compilar(programa)
 
-	def debug(self, mensagem):
-		if (not self.isDebug): return
-		print(mensagem)
+        self.memory = [linha.replace("\n", "") for linha in programa]
+        
+        for index, linha in enumerate(self.memory):
+            if linha[0:8] in self.instructions:
+                self.PC = intToBin(index, 20)
+                break
 
-	def executePC(self):
-		self.busca()
-		self.decodifica()
-		self.executa()
+    def debug(self, mensagem, end='\n'):
+        if (not self.isDebug): return
+        print(mensagem, end=end)
 
-		self.PC = intToBin(binToInt(self.PC) + 1, 20)
+    def run(self):
+        self.running = True
+        
+        if self.isDebug:
+            print('')
+            print(' Execução '.center(40, '='))
+            print('')
 
-		if (binToInt(self.PC) >= len(self.memory)):
-			print('Execução do programa finalizada!')
+        while self.running:
+            self.busca()
+            self.decodifica()
+            self.buscaOperandos()
+            self.executa()
 
-			print('Memoria:')
-			for index, linha in enumerate(ias.memory):
-				print(str(index) + ': ' + linha, '(' + str(binToInt(linha)) + ')')
-			print('')
-			print('AC: ', ias.AC, '(' + str(binToInt(ias.AC)) + ')')
-			print('MQ: ', ias.MQ, '(' + str(binToInt(ias.MQ)) + ')')
-			print('PC: ', ias.PC, '(' + str(binToInt(ias.PC)) + ')')
-			print('MBR: ', ias.MBR, '(' + str(binToInt(ias.MBR)) + ')')
-			print('MAR: ', ias.MAR, '(' + str(binToInt(ias.MAR)) + ')')
-			print('IR: ', ias.IR, '(' + str(binToInt(ias.IR)) + ')')
-			return
+            if (binToInt(self.PC) >= len(self.memory)):
+                self.running = False
 
-		self.executePC()
+        self.display()
+
+    def display(self):
+        print('\nExecução do programa finalizada!\n')
+        print(' Memoria '.center(40, '='))
+        print('')
+
+        for index, linha in enumerate(ias.memory):
+            print(str(index) + ':' + (' ' * (7 - len(str(index)))) + linha + ' ' * 3 + '(' + str(binToInt(linha)) + ')')
+
+        print('')
+        print(' Registradores '.center(40, '='))
+        print('')
+        print('AC:    ', ias.AC +  '   (' + str(binToInt(ias.AC)) + ')')
+        print('MQ:    ', ias.MQ +  '   (' + str(binToInt(ias.MQ)) + ')')
+        print('PC:    ', ias.PC.zfill(20) +  '   (' + str(binToInt(ias.PC)) + ')')
+        print('MBR:   ', ias.MBR + '   (' + str(binToInt(ias.MBR)) + ')')
+        print('MAR:   ', ias.MAR.zfill(20) + '   (' + str(binToInt(ias.MAR)) + ')')
+        print('IR:    ', ias.IR.zfill(20) +  '   (' + str(binToInt(ias.IR)) + ')')
 
 # INICIO
 # 
 # python3 ias.py <nome do arquivo de entrada> <endereco de inicio das instrucoes>
 # --debug para mostrar a execução detalhada do programa
-ias = IAS(intToBin(int(sys.argv[2]), 20), '--debug' in sys.argv)
+ias = IAS('--debug' in sys.argv)
 ias.carga_memoria(sys.argv[1])
-ias.executePC()
+
+if '--compile' in sys.argv: 
+    print('')
+    print(' Compilado '.center(40, '='))
+    print('')
+    for l in ias.memory:
+        print(l)
+
+ias.run()
